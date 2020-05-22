@@ -84,9 +84,7 @@ def find_index(name, df):
         while unique_name.strip('\n') not in names:
             print('Invalid input. Do you mean '+string)
             unique_name = input()
-        print(unique_name)
         idx = df.loc[df['unique_name'] == unique_name,'tax_id']
-        print(idx)
     return -1 if len(idx) == 0 else int(idx.iloc[0])
     
 def test_tree():

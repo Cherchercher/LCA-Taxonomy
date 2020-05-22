@@ -40,16 +40,10 @@ processing rows 2248390 to 2473229
 finish constructing tree....
 There are multiple entries associated with the name. Do you mean Monera <bacteria> or Monera <archaea>?
 Monera <archaea>
-Monera <archaea>
-19633    2157
-Name: tax_id, dtype: int64
 There are multiple entries associated with the name. Do you mean Bacteria <bacteria> or Bacteria <walking sticks>?
 Bacteria <walking sticks
 Invalid input. Do you mean Bacteria <bacteria> or Bacteria <walking sticks>?
 Bacteria <walking sticks>
-Bacteria <walking sticks>
-936752    629395
-Name: tax_id, dtype: int64
 The lease common ancestor of Monera and Bacteria is biota or cellular organisms
 ```
 
