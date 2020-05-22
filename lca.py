@@ -64,7 +64,7 @@ def find_name(idx, df):
     name = df.loc[df['tax_id'] == idx, 'name_txt']
     if len(name) > 1:
         return ' or '.join(name.values.tolist())
-    return -1 if len(name) == 0 else name.iloc[0]
+    return "Not Found" if len(name) == 0 else name.iloc[0]
   
 def find_index(name, df):
     """
