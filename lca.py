@@ -8,8 +8,7 @@ import csv
 import pandas as pd
 from collections import defaultdict
 import math
-from io import BytesIO
-from tarfile import TarFile
+import sys
 from urllib.request import urlopen
 
 class TaxTree:
@@ -43,7 +42,7 @@ class TaxTree:
         diff = self.depth[v] - self.depth[u]
         for i in range(self.level):
             if ((diff >> i) & 1) == 1:
-                v = self.parent[v][i];
+                v = self.parent[v][i]
         if u == v:
             return u
         for i in range(self.level-1,-1,-1):
@@ -61,18 +60,35 @@ def find_name(idx, df):
     """
     lookup the tax_id in names.dmp (O(1))
     return tax_index if found, -1 if not found
+    if multiple names are found, return all of them concatenated by 'or'
     """
-    name = df.loc[df['tax_id'] == idx,'name_txt']
+    name = df.loc[df['tax_id'] == idx, 'name_txt']
+    if len(name) > 1:
+        return ' or '.join(name.values.tolist())
     return -1 if len(name) == 0 else name.iloc[0]
-    
-
+  
 def find_index(name, df):
     """
     lookup the tax_id in names.dmp (O(1))
     return tax_index if found, -1 if not found
+    if multiple indexs are found, ask for disambiguation based off of unique names
     """
     idx = df.loc[df['name_txt'] == name,'tax_id']
-    return -1 if len(idx) == 0 else idx.iloc[0]
+    if len(idx)>1:
+        names = df.loc[df['name_txt'] == name,'unique_name'].values.tolist()
+        string = ' or '.join(names[-2:])
+        string += '?' 
+        if len(names)>2:
+            string = ','.join(names[:-2]) + string
+        print('There are multiple entries associated with the name. Do you mean '+string)
+        unique_name = input()
+        while unique_name.strip('\n') not in names:
+            print('Invalid input. Do you mean '+string)
+            unique_name = input()
+        print(unique_name)
+        idx = df.loc[df['unique_name'] == unique_name,'tax_id']
+        print(idx)
+    return -1 if len(idx) == 0 else int(idx.iloc[0])
     
 def test_tree():
     tree = TaxTree(8, 1000)
@@ -109,8 +125,8 @@ def read_files():
     names = pd.read_csv('names.dmp',sep='\t\|\t', lineterminator='\t\|\n')
     nodes = pd.read_csv('nodes.dmp',sep='\t\|\t', lineterminator='\t\|\n')
     #read df and get relevant cols from names
-    names = names.iloc[:,0:2]
-    names.columns = ['tax_id', 'name_txt']
+    names = names.iloc[:,0:3]
+    names.columns = ['tax_id', 'name_txt','unique_name']
     #read df and get relevant cols from nodes
     nodes = nodes.iloc[:,0:2]
     nodes.columns = ['tax_id', 'parent_tax_id']
@@ -128,12 +144,8 @@ def max_depth(tree, root):
         max_height = max(max_height, max_depth(tree, child))
     return max_height+1
 
-if __name__ == "__main__":
-    # execute only if run as a script
-    main()
-
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         print('please input two names seperated by space ')
         sys.exit()
     names, nodes = read_files()
@@ -152,7 +164,11 @@ def main():
     tree.dfs(1, 0)
     tree.precomputeSparseMatrix()
     print('finish constructing tree....')
-    print('The lease common ancestor of {} and {} is {}'.format(sys.argv[0], sys.argv[1], find_name(tree.lca(int(find_index(sys.argv[0], names)), int(find_index(sys.argv[1], names))), names)))
+    print('The lease common ancestor of {} and {} is {}'.format(sys.argv[1], sys.argv[2], find_name(tree.lca(int(find_index(sys.argv[1], names)), int(find_index(sys.argv[2], names))), names)))
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()
 
 #data vis
 #new_df = pd.merge(names, nodes, on='tax_id', how='left')
