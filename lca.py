@@ -57,8 +57,8 @@ class TaxTree:
 
 def find_name(idx, df):
     """
-    lookup the tax_id in names.dmp (O(1))
-    return tax_index if found, -1 if not found
+    lookup the name in names.dmp (O(1))
+    return name if found,  "Not Found" if not found
     if multiple names are found, return all of them concatenated by 'or'
     """
     name = df.loc[df['tax_id'] == idx, 'name_txt']
