@@ -9,7 +9,6 @@ import pandas as pd
 from collections import defaultdict
 import math
 import sys
-from urllib.request import urlopen
 
 class TaxTree:
     def __init__(self, numNodes, level):
